@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="30">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Clock</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; color: #222; }
+    h1 { color: #1F4E79; border-bottom: 2px solid #2E75B6; padding-bottom: 8px; }
+    h2 { color: #2E75B6; }
+    .clock { font-size: 2em; font-weight: bold; color: #1F4E79; background: #fff; padding: 16px 24px; border-radius: 8px; display: inline-block; margin: 10px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .zone { font-size: 0.7em; color: #888; font-weight: normal; }
+    .cities { margin-top: 20px; }
+    .cities a { display: inline-block; margin: 6px 8px; padding: 8px 16px; background: #2E75B6; color: white; text-decoration: none; border-radius: 4px; font-size: 0.95em; }
+    .cities a:hover { background: #1F4E79; }
+    .home-link { margin-top: 20px; display: inline-block; padding: 8px 16px; background: #555; color: white; text-decoration: none; border-radius: 4px; }
+    .home-link:hover { background: #333; }
+    .sa-box { background: #E2EFDA; border-left: 4px solid #1E7145; padding: 12px 20px; border-radius: 4px; margin: 10px 0; }
+    .city-box { background: #EBF3FB; border-left: 4px solid #2E75B6; padding: 12px 20px; border-radius: 4px; margin: 10px 0; }
+    .diff-box { background: #FFF8E1; border: 2px dashed #F0A500; padding: 12px 20px; border-radius: 8px; margin: 14px 0; font-size: 1.15em; color: #555; text-align: center; }
+    .diff-box strong { color: #1F4E79; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>World Clock</h1>
+  <div class="sa-box">
+    <h2>South Africa (Johannesburg)</h2>
+    <div class="clock">
+      04:09:22 on 06 Mar 2026
+      <span class="zone"> UTC+2</span>
+    </div>
+  </div>
+  <div class="cities">
+    <h2>Select a city to compare:</h2>
+    <a href="/London">London</a>
+    <a href="/New-York">New York</a>
+    <a href="/Los-Angeles">Los Angeles</a>
+    <a href="/Paris">Paris</a>
+    <a href="/Dubai">Dubai</a>
+    <a href="/Mumbai">Mumbai</a>
+    <a href="/Beijing">Beijing</a>
+    <a href="/Tokyo">Tokyo</a>
+    <a href="/Sydney">Sydney</a>
+    <a href="/Sao-Paulo">Sao Paulo</a>
+  </div>
+</body>
+</html>
