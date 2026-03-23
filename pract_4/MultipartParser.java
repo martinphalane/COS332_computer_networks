@@ -1,75 +1,99 @@
 // MultipartParser.java
 // COS332 Practical Assignment 4
 //
-// Parses a multipart/form-data request body.
+// Manually parses a multipart/form-data request body.
 // This is the format browsers use when a form contains a file upload.
 //
 // A multipart body looks like this:
-// --boundary\r\n
-// Content-Disposition: form-data; name="person"\r\n
-// \r\n
-// Dr Smith\r\n
-// --boundary\r\n
-// Content-Disposition: form-data; name="photo"; filename="face.jpg"\r\n
-// Content-Type: image/jpeg\r\n
-// \r\n
-// [binary image bytes]
-// --boundary--\r\n
 //
-// We parse this manually — no libraries used.
+//   --boundary\r\n
+//   Content-Disposition: form-data; name="person"\r\n
+//   \r\n
+//   Dr Smith\r\n
+//   --boundary\r\n
+//   Content-Disposition: form-data; name="photo"; filename="face.jpg"\r\n
+//   Content-Type: image/jpeg\r\n
+//   \r\n
+//   [binary image bytes]
+//   --boundary--\r\n
+//
+// No external libraries are used — everything is done with byte arrays.
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MultipartParser {
 
-    // Holds the result of parsing one multipart field
+    // Holds the result of parsing one multipart part
     public static class Field {
         public String name;      // form field name  e.g. "person"
-        public String filename;  // only set for file uploads
-        public byte[] value;     // raw bytes of the field value
+        public String filename;  // only set for file upload parts
+        public byte[] value;     // raw bytes of the part body
 
-        // Convenience — get value as a plain string (for text fields)
+        // Convenience: interpret the bytes as a plain UTF-8 string
         public String asString() {
             if (value == null) return "";
-            return new String(value);
+            try {
+                return new String(value, "UTF-8");
+            } catch (Exception e) {
+                return new String(value);
+            }
         }
     }
 
-    // Parse the raw body bytes and boundary string
-    // Returns a map of field name → Field object
+    // ── Main entry point ─────────────────────────────────────
+    // body     = the raw POST body bytes
+    // boundary = the boundary string from the Content-Type header
+    //            (WITHOUT the leading "--")
     public static Map<String, Field> parse(byte[] body, String boundary) {
         Map<String, Field> fields = new HashMap<>();
-        if (body == null || boundary == null) return fields;
+        if (body == null || body.length == 0
+                || boundary == null || boundary.isEmpty())
+            return fields;
 
-        // The boundary delimiter in the body is "--" + boundary
+        // The actual delimiter in the body is "--" + boundary
         byte[] delimiter = ("--" + boundary).getBytes();
 
-        // Split the body on the boundary to get each part
-        int[] positions = findAll(body, delimiter);
+        // Find all positions where the delimiter appears
+        List<Integer> positions = findAll(body, delimiter);
+        if (positions.size() < 2) return fields;
 
-        for (int i = 0; i < positions.length - 1; i++) {
-            // Start just after the delimiter + CRLF
-            int start = positions[i] + delimiter.length + 2;
-            // End just before the next delimiter (minus CRLF)
-            int end   = positions[i + 1] - 2;
+        // Each pair of consecutive positions brackets one part
+        for (int i = 0; i < positions.size() - 1; i++) {
+            // Skip past the delimiter and the \r\n that follows it
+            int start = positions.get(i) + delimiter.length;
+            // Skip the \r\n after the boundary line
+            if (start + 1 < body.length
+                    && body[start] == '\r' && body[start + 1] == '\n')
+                start += 2;
+
+            // The part ends just before the next delimiter,
+            // minus the \r\n that precedes it
+            int end = positions.get(i + 1);
+            if (end >= 2
+                    && body[end - 2] == '\r' && body[end - 1] == '\n')
+                end -= 2;
+
             if (start >= end) continue;
 
-            // Extract this part's bytes
+            // Slice out this one part
             byte[] part = slice(body, start, end);
 
-            // Split headers from body at the first blank line (\r\n\r\n)
+            // Find the blank line (\r\n\r\n) that separates headers
+            // from the part body
             int blankLine = indexOf(part, "\r\n\r\n".getBytes(), 0);
             if (blankLine < 0) continue;
 
-            String headers  = new String(slice(part, 0, blankLine));
-            byte[] partBody = slice(part, blankLine + 4, part.length);
+            String headerBlock = new String(slice(part, 0, blankLine));
+            byte[] partBody    = slice(part, blankLine + 4, part.length);
 
-            // Parse Content-Disposition header to get name and filename
+            // Parse Content-Disposition to get name / filename
             Field field = new Field();
             field.value = partBody;
 
-            for (String header : headers.split("\r\n")) {
+            for (String header : headerBlock.split("\r\n")) {
                 if (header.toLowerCase()
                           .startsWith("content-disposition")) {
                     field.name     = extractParam(header, "name");
@@ -77,14 +101,13 @@ public class MultipartParser {
                 }
             }
 
-            if (field.name != null) {
+            if (field.name != null)
                 fields.put(field.name, field);
-            }
         }
         return fields;
     }
 
-    // Extract a parameter value from a header string
+    // ── Extract a quoted parameter from a header ──────────────
     // e.g. extractParam("...name=\"photo\"...", "name") → "photo"
     private static String extractParam(String header, String param) {
         String search = param + "=\"";
@@ -96,24 +119,20 @@ public class MultipartParser {
         return header.substring(start, end);
     }
 
-    // Find all positions of a byte pattern in a byte array
-    private static int[] findAll(byte[] data, byte[] pattern) {
-        int[] temp = new int[1000];
-        int count  = 0;
-        int pos    = 0;
-        while (pos < data.length) {
+    // ── Find all positions of a byte pattern ─────────────────
+    private static List<Integer> findAll(byte[] data, byte[] pattern) {
+        List<Integer> result = new ArrayList<>();
+        int pos = 0;
+        while (pos <= data.length - pattern.length) {
             int found = indexOf(data, pattern, pos);
             if (found < 0) break;
-            temp[count++] = found;
+            result.add(found);
             pos = found + pattern.length;
         }
-        // Copy to correctly sized array
-        int[] result = new int[count];
-        System.arraycopy(temp, 0, result, 0, count);
         return result;
     }
 
-    // Find first occurrence of pattern in data starting at offset
+    // ── Find first occurrence of pattern starting at offset ──
     private static int indexOf(byte[] data, byte[] pattern, int offset) {
         outer:
         for (int i = offset; i <= data.length - pattern.length; i++) {
@@ -125,7 +144,7 @@ public class MultipartParser {
         return -1;
     }
 
-    // Return a slice of a byte array from start (inclusive) to end (exclusive)
+    // ── Slice a byte array [start, end) ──────────────────────
     private static byte[] slice(byte[] data, int start, int end) {
         if (start < 0) start = 0;
         if (end > data.length) end = data.length;

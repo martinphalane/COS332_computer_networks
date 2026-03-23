@@ -1,6 +1,9 @@
 // Appointment.java
 // COS332 Practical Assignment 4
-// One appointment record — now includes an optional photo filename
+// One appointment record — stores date, time, person, notes, optional photo.
+//
+// File format uses pipe | as separator.
+// Pipes inside field values are escaped as \P so the format is never broken.
 
 public class Appointment {
     public String id;
@@ -8,8 +11,8 @@ public class Appointment {
     public String time;
     public String person;
     public String notes;
-    // Filename of the stored photo, e.g. "photo_1.jpg"
-    // Empty string means no photo was uploaded
+    // Filename of the stored photo e.g. "photo_1.jpg"
+    // Empty string means no photo was uploaded.
     public String photo;
 
     public Appointment(String id, String date, String time,
@@ -22,20 +25,36 @@ public class Appointment {
         this.photo  = photo == null ? "" : photo;
     }
 
-    // Save to file — pipe separated, photo field last
-    // "1|2026-03-25|14:00|Dr Smith|Checkup|photo_1.jpg"
+    // ── Serialise to one file line ────────────────────────────
+    // Format: id|date|time|person|notes|photo
+    // Pipes inside values are escaped as \P so the format stays safe.
     public String toFileLine() {
-        return id + "|" + date + "|" + time + "|"
-             + person + "|" + notes + "|" + photo;
+        return fileEsc(id)     + "|" + fileEsc(date)   + "|"
+             + fileEsc(time)   + "|" + fileEsc(person) + "|"
+             + fileEsc(notes)  + "|" + fileEsc(photo);
     }
 
-    // Load from that same line
+    // ── Deserialise from one file line ────────────────────────
     public static Appointment fromFileLine(String line) {
-        // Split into at most 6 parts so notes can contain |
+        if (line == null || line.trim().isEmpty()) return null;
         String[] p = line.split("\\|", 6);
         if (p.length < 5) return null;
-        String photo = p.length >= 6 ? p[5] : "";
-        return new Appointment(p[0], p[1], p[2], p[3], p[4], photo);
+        String photo = p.length >= 6 ? fileUnesc(p[5]) : "";
+        return new Appointment(
+            fileUnesc(p[0]), fileUnesc(p[1]), fileUnesc(p[2]),
+            fileUnesc(p[3]), fileUnesc(p[4]), photo);
+    }
+
+    // Escape backslashes first, then pipes
+    private static String fileEsc(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("|", "\\P");
+    }
+
+    // Reverse: unescape pipes first, then backslashes
+    private static String fileUnesc(String s) {
+        if (s == null) return "";
+        return s.replace("\\P", "|").replace("\\\\", "\\");
     }
 
     // True if a photo has been stored for this appointment
