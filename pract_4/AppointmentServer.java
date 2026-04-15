@@ -1,5 +1,6 @@
 // AppointmentServer.java
 // COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 
 import java.io.IOException;
 import java.net.ServerSocket;

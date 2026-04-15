@@ -1,9 +1,14 @@
+
+// COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 // Appointment.java
 // COS332 Practical Assignment 4
 // One appointment record — stores date, time, person, notes, optional photo.
 //
 // File format uses pipe | as separator.
 // Pipes inside field values are escaped as \P so the format is never broken.
+
+
 
 public class Appointment {
     public String id;

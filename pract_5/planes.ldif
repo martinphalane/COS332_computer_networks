@@ -1,0 +1,53 @@
+# =============================================================
+# COS332 Practical 5 - Planes OU setup
+# Student: u26535272
+#
+# Usage:
+#   ldapadd -x -D "cn=admin,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za" \
+#           -W -f planes.ldif
+#
+# The 'description' attribute stores maximum speed in km/h.
+# =============================================================
+
+# --- Organisational Unit ---
+dn: ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: organizationalUnit
+ou: Planes
+description: Aircraft assets
+
+# --- Entries ---
+
+dn: cn=Concorde,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: Concorde
+description: 2179
+
+dn: cn=Boeing747,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: Boeing747
+description: 988
+
+dn: cn=AirbusA380,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: AirbusA380
+description: 903
+
+dn: cn=F22Raptor,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: F22Raptor
+description: 1960
+
+dn: cn=SR71Blackbird,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: SR71Blackbird
+description: 3540
+
+dn: cn=SpitfireMkI,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: SpitfireMkI
+description: 594
+
+dn: cn=CessnaSkyhawk,ou=Planes,dc=prac5,dc=cos332,dc=up,dc=ac,dc=za
+objectClass: device
+cn: CessnaSkyhawk
+description: 226

@@ -2,6 +2,8 @@
 // COS332 Practical Assignment 4
 // Produces every HTML page.
 // NO JavaScript anywhere — all logic is server-side Java.
+// COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 
 import java.util.List;
 
@@ -519,6 +521,98 @@ public class HtmlBuilder {
         }
         sb.append("</div>");
         return page("Search", "/search", sb.toString());
+    }
+
+    // ── Redirect countdown page ───────────────────────────────
+    // Uses <meta http-equiv="refresh"> — pure HTML, no JavaScript.
+    // The browser waits `seconds` seconds then navigates to `url`.
+    // A CSS animation draws a shrinking ring to show the countdown visually.
+    //
+    // `message` is the human-readable action that just happened,
+    // e.g. "Appointment added!" or "Appointment deleted."
+    public static String redirectPage(String url, int seconds,
+                                       String message) {
+        // CSS keyframe that shrinks the ring stroke over `seconds` seconds.
+        // stroke-dashoffset goes from 0 (full circle) to 251 (empty).
+        // 251 ≈ 2 * PI * 40  (circumference of a circle with r=40)
+        String ringCss =
+            "<style>"
+          + "@keyframes countdown{"
+          +   "from{stroke-dashoffset:0}"
+          +   "to{stroke-dashoffset:251}"
+          + "}"
+          + ".ring-wrap{display:flex;flex-direction:column;"
+          +            "align-items:center;justify-content:center;"
+          +            "padding:48px 20px}"
+          + ".ring-svg{transform:rotate(-90deg)}"
+          + ".ring-bg{fill:none;stroke:#edf2f7;stroke-width:8}"
+          + ".ring-fg{fill:none;stroke:#e67e22;stroke-width:8;"
+          +          "stroke-linecap:round;"
+          +          "stroke-dasharray:251;"
+          +          "stroke-dashoffset:0;"
+          +          "animation:countdown " + seconds + "s linear forwards}"
+          + ".ring-num{font-size:28px;font-weight:700;color:#1a202c;"
+          +           "margin-top:16px}"
+          + ".ring-msg{font-size:15px;color:#718096;margin-top:8px;"
+          +           "text-align:center}"
+          + ".ring-link{display:inline-block;margin-top:20px;"
+          +            "color:#e67e22;font-size:13px;"
+          +            "text-decoration:underline}"
+          + "</style>";
+
+        String body =
+            ringCss
+          + "<div class='card' style='max-width:400px;margin:60px auto'>"
+          + "<div class='ring-wrap'>"
+
+          // Green tick icon
+          + "<div style='font-size:52px;margin-bottom:8px'>&#9989;</div>"
+
+          // The message — e.g. "Appointment added!"
+          + "<div style='font-size:18px;font-weight:700;color:#1a202c;"
+          +             "margin-bottom:24px;text-align:center'>"
+          + esc(message)
+          + "</div>"
+
+          // SVG ring — pure CSS animation, no JS
+          + "<svg class='ring-svg' width='100' height='100' viewBox='0 0 100 100'>"
+          + "<circle class='ring-bg' cx='50' cy='50' r='40'/>"
+          + "<circle class='ring-fg' cx='50' cy='50' r='40'/>"
+          + "</svg>"
+
+          // "Redirecting in 3 seconds"
+          + "<div class='ring-num'>Redirecting in " + seconds
+          + (seconds == 1 ? " second" : " seconds") + "&#8230;</div>"
+
+          // Manual link in case the meta-refresh is blocked
+          + "<a class='ring-link' href='" + esc(url)
+          + "'>Click here if not redirected automatically</a>"
+          + "</div></div>";
+
+        // The meta-refresh tag is what actually performs the redirect.
+        // It lives in the <head> — we build a custom page wrapper here
+        // rather than using page() so we can inject the meta tag.
+        return "<!DOCTYPE html><html lang='en'><head>"
+             + "<meta charset='UTF-8'>"
+             + "<meta name='viewport' "
+             +      "content='width=device-width,initial-scale=1'>"
+             // This is the HTML redirect — waits `seconds` then goes to url
+             + "<meta http-equiv='refresh' "
+             +      "content='" + seconds + "; url=" + url + "'>"
+             + "<title>Redirecting&#8230;</title>"
+             + CSS
+             + "</head><body>"
+             + "<div class='header'>"
+             +   "<div style='display:flex;align-items:center'>"
+             +     "<span class='header-icon'>&#128197;</span>"
+             +     "<h1>Appointment Manager</h1>"
+             +   "</div>"
+             + "</div>"
+             + "<div class='container'>"
+             + body
+             + "</div>"
+             + "<div class='footer'>COS332 Practical Assignment 4</div>"
+             + "</body></html>";
     }
 
     // ── 404 page ──────────────────────────────────────────────

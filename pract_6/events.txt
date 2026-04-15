@@ -1,0 +1,10 @@
+# Events file for COS332 Prac 6
+# Format: dd/mm description
+# The program sends a reminder 6 days before each event
+
+18/04 Mihlali 
+20/04 John
+2/04  Zee s Birthday
+19/04 Prof Birhtday
+09/04 National Women's Day
+24/04 Heritage Day

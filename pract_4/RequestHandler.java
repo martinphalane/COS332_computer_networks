@@ -1,5 +1,6 @@
 // RequestHandler.java
 // COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 //
 // Handles every HTTP request in its own thread.
 // All communication happens via raw sockets — no HTTP libraries.
@@ -140,15 +141,8 @@ public class RequestHandler implements Runnable {
         switch (path) {
             case "/": {
                 String sort  = params.getOrDefault("sort", "");
-                // msg comes from a POST -> 302 redirect
-                // e.g. /?msg=added  /?msg=updated  /?msg=deleted
-                String msg   = params.getOrDefault("msg", "");
-                String flash = "";
-                if      ("added".equals(msg))   flash = "Appointment added!";
-                else if ("updated".equals(msg)) flash = "Appointment updated!";
-                else if ("deleted".equals(msg)) flash = "Appointment deleted.";
                 return html(200, HtmlBuilder.home(
-                    store.getAll(sort), flash, sort, store));
+                    store.getAll(sort), "", sort, store));
             }
 
             case "/add":
@@ -223,10 +217,7 @@ public class RequestHandler implements Runnable {
         }
 
         store.add(date, time, person, notes, photoBytes, photoExt);
-
-        // ── POST → 302 → GET ──────────────────────────────────
-        // Redirecting prevents duplicate submissions on browser Refresh.
-        return redirect("/?msg=added");
+        return redirect("/", "Appointment added successfully!");
     }
 
     // ── POST: Edit appointment ────────────────────────────────
@@ -275,7 +266,7 @@ public class RequestHandler implements Runnable {
         }
 
         store.update(id, date, time, person, notes, photoBytes, photoExt);
-        return redirect("/?msg=updated");
+        return redirect("/", "Appointment updated successfully!");
     }
 
     // ── GET: Show edit form pre-filled ────────────────────────
@@ -298,7 +289,7 @@ public class RequestHandler implements Runnable {
     private HttpResponse doDelete(Map<String, String> p) {
         String id = p.getOrDefault("id", "").trim();
         store.delete(id);
-        return redirect("/?msg=deleted");
+        return redirect("/", "Appointment deleted.");
     }
 
     // ── GET: Search ───────────────────────────────────────────
@@ -534,17 +525,23 @@ public class RequestHandler implements Runnable {
                                 new byte[0], SERVER_START);
     }
 
-    // 302 redirect — used after every successful POST
-    // (POST → Redirect → GET pattern, RFC 2616 Section 10.3.3)
-    private HttpResponse redirect(String location) {
+    // ── Redirect with countdown page ─────────────────────────
+    // Returns a 200 HTML page that uses <meta http-equiv="refresh">
+    // to navigate to `location` after 3 seconds.
+    // A CSS ring animation counts down visually — no JavaScript used.
+    // This replaces the bare 302 response so the user sees feedback
+    // before the page changes, and prevents duplicate POST on Refresh
+    // because the final page is a GET to location.
+    private HttpResponse redirect(String location, String message) {
+        String html = HtmlBuilder.redirectPage(location, 3, message);
         try {
-            byte[] body = ("Redirecting to " + location)
-                            .getBytes("UTF-8");
-            return new HttpResponse(302,
-                "text/plain", body, SERVER_START, location);
+            return new HttpResponse(200,
+                "text/html; charset=UTF-8",
+                html.getBytes("UTF-8"), SERVER_START);
         } catch (UnsupportedEncodingException e) {
-            return new HttpResponse(302,
-                "text/plain", new byte[0], SERVER_START, location);
+            return new HttpResponse(200,
+                "text/html; charset=UTF-8",
+                new byte[0], SERVER_START);
         }
     }
 

@@ -1,4 +1,5 @@
-// AppointmentStore.java
+// COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 // COS332 Practical Assignment 4
 // Thread-safe in-memory store with file persistence and photo storage.
 

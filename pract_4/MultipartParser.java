@@ -1,5 +1,7 @@
 // MultipartParser.java
 // COS332 Practical Assignment 4
+// COS332 Practical Assignment 4
+// Student: u26535272 Martin Phalane
 //
 // Manually parses a multipart/form-data request body.
 // This is the format browsers use when a form contains a file upload.
