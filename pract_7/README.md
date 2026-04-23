@@ -53,14 +53,17 @@ sudo apt install mailutils -y
 
 ### 4. Create a test user
 ```bash
-sudo adduser testuser
+sudo adduser cos332
 ```
 
 ### 5. Send test emails
 ```bash
-echo "Hello there" | sudo mail -s "Test email 1" testuser
-echo "Meeting at 3pm" | sudo mail -s "Meeting" testuser
-echo "Delete this" | sudo mail -s "Spam" testuser
+echo "New assignment has been released" | sudo mail -s "Assignemnt" cos332
+echo "Meeting at 3pm for cos332" | sudo mail -s "Meeting" cos332
+echo "Click here to win 10 bitcoin" | sudo mail -s "Spam" cos332
+echo "Waiting for a response from Martin " | sudo mail -s "Martin" cos332
+echo "User martin has been registered" | sudo mail -s "u26535272" cos332
+
 ```
 
 ---
@@ -87,8 +90,8 @@ Open `MailboxManager.java` and change these four lines at the top:
 ```java
 static String host     = "127.0.0.1";   // your server IP
 static int    port     = 110;            // POP3 port
-static String username = "testuser";     // your mail username
-static String password = "test123";      // your mail password
+static String username = "cos332";     // your mail username
+static String password = "admin";      // your mail password
 ```
 
 ---
@@ -126,6 +129,5 @@ commits all deletions.
 
 ## Author
 
-COS332 - Computer Networks
-University of Pretoria
-2026
+Martin Phalane
+u26535272

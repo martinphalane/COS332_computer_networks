@@ -9,8 +9,8 @@ public class MailboxManager {
     // ----------------------------------------------------------------
     static String host     = "127.0.0.1";
     static int    port     = 110;
-    static String username = "testuser";
-    static String password = "test123";
+    static String username = "cos332";
+    static String password = "admin";
 
     // ----------------------------------------------------------------
     // Global variables used throughout the program
