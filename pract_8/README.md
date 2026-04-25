@@ -82,7 +82,7 @@ static String USERNAME      = "your-wsl-username"; // your WSL login name
 static String PASSWORD      = "your-wsl-password"; // your WSL login password
 static String WATCH_FOLDER  = "/mnt/c/Users/YourName/Documents/watch"; // folder to watch
 static String BACKUP_FOLDER = "/backup/";
-static int    CHECK_EVERY   = 60;
+static int    CHECK_EVERY   = 20;
 ```
 
 ### Create the watch folder
@@ -123,7 +123,7 @@ You should see:
 
 Watching: /mnt/c/Users/YourName/Documents/watch
 Found 0 existing file(s).
-Checking every 60 seconds...
+Checking every 20 seconds...
 ```
 
 ---
