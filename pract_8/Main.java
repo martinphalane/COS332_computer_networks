@@ -25,7 +25,6 @@ public class Main {
 
         // Start watching the folder
         FolderMonitor monitor = new FolderMonitor(WATCH_FOLDER);
-        
 
         System.out.println("Checking every " + CHECK_EVERY + " seconds...\n");
 

@@ -7,10 +7,10 @@ public class settings {
     static int    SERVER_PORT   = 21;
  
     // Your FTP username
-    static String USERNAME    = "ftpuser";
+    static String USERNAME    = "cos332";
  
     // Your FTP password
-    static String PASSWORD   = "password";
+    static String PASSWORD   = "admin";
  
     // The folder on your computer to watch for changes
     static String WATCH_FOLDER  = "/mnt/c/Users/Mart/Documents/cos332";
@@ -19,7 +19,7 @@ public class settings {
     static String BACKUP_FOLDER = "/backup/";
  
     // How often to check for changes (in seconds)
-    static int    CHECK_EVERY   = 20;         // How often to check for changes (in seconds)
+    static int    CHECK_EVERY   = 10;         // How often to check for changes (in seconds)
     // This method finds your machine's IP automatically
 
 
